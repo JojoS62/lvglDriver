@@ -399,7 +399,7 @@ void LVGLDispST7735::flush(const lv_area_t *area, lv_color_t *color_p)
     // _spi.write((const char*)color_p, len, nullptr, 0);						// transfer pixel data
     
     int len = (area->x2 - area->x1 + 1) * (area->y2 - area->y1 + 1) * 2; 	// in bytes
-    [[maybe_unused]] volatile int rc = _spi.transfer((uint16_t*)color_p, len, (uint16_t*)nullptr,  0, callback(this, &LVGLDispST7735::flush_ready));
+    [[maybe_unused]] volatile int rc = _spi.transfer((uint16_t*)color_p, len, nullptr,  0, callback(this, &LVGLDispST7735::flush_ready));
 }
 
 void LVGLDispST7735::flush_ready(int event_flags)
