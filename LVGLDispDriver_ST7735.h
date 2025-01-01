@@ -44,14 +44,13 @@ private:
 
     uint32_t _nBufferRows;
     void init();
-    static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-    void flush(const lv_area_t * area, lv_color_t * color_p);
+    static void disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t *px_map);
+    void flush(const lv_area_t * area, lv_color16_t * color_p);
     void flush_ready(int event_flags);
 
     void controllerInit();
 
-    lv_disp_draw_buf_t _disp_buf_1;
-    lv_color_t *_buf1_1;     // display working buffer
+    lv_color16_t *_buf1_1;     // display working buffer
 
     void command(uint8_t cmd);
     void data(uint8_t data);

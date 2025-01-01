@@ -1,3 +1,4 @@
+
 /* lvglDriver for Mbed
  * Copyright (c) 2019 Johannes Stratmann
  *
@@ -20,33 +21,20 @@
  * SOFTWARE.
  */
 
-#ifndef __LVGLTouchDriverXPT2046_h__
-#define __LVGLTouchDriverXPT2046_h__
+#pragma once
 
-#include "LVGLInputDriverBase.h"
+#include "display_ltdc.h"
+#include "LVGLDispDriverBase.h"
 
-#define XPT2046_AVG         4
-
-class LVGLTouchDriverXPT2046 : public LVGLInputDriver {
+class LVGLDispFK743 : public LVGLDispDriver {
 public:
-    /*
-        construct touch driver from SPI pins
-        Disp is optional, if null then lvgl will use default display
-    */
-    LVGLTouchDriverXPT2046(PinName mosi, PinName miso, PinName sclk, PinName ssel, PinName penIRQ, LVGLDispDriver *lvglDispDriver = nullptr);
+    LVGLDispFK743(uint32_t resolutionX = LCD_Width, uint32_t resolutionY = LCD_Height);
 
 private:
-    SPI _spi;
-    DigitalIn _irqTouch;
-    DigitalOut _csTouch;
+    DisplayLTDC display;
 
-    int16_t avg_buf_x[XPT2046_AVG];
-    int16_t avg_buf_y[XPT2046_AVG];
-    uint8_t avg_last;
-
-    static void read_cb(lv_indev_t * indev, lv_indev_data_t * data);
-    void corr(int16_t * x, int16_t * y);
-    void avg(int16_t * x, int16_t * y);
+    void init();
+    static void disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t *px_map);
+    void flush(const lv_area_t * area, lv_color32_t * color_p);
+    void flush_ready(int event_flags);
 };
-
-#endif

@@ -31,7 +31,7 @@
 class LVGLInputDriver {
 public:
     lv_disp_t* getLVDisp() { return _lvglDispDriverBase != nullptr ?_lvglDispDriverBase->getLVDisp() : nullptr; };
-    lv_indev_drv_t* getLVInDev() { return &_indev_drv; };
+    lv_indev_t* getLVInDev() { return _indev; };
 
     /** Return the default input touchscreen device
      *
@@ -51,9 +51,8 @@ protected:
 
     virtual void init() {};
 
-    lv_indev_drv_t _indev_drv;
+    lv_indev_t *_indev;
     LVGLDispDriver*  _lvglDispDriverBase;
-    lv_indev_t *_my_indev;
 };
 
 #endif

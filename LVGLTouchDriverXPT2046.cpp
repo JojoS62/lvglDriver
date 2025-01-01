@@ -56,22 +56,19 @@ LVGLTouchDriverXPT2046::LVGLTouchDriverXPT2046(PinName mosi, PinName miso, PinNa
     _spi.write(0x80); // Enable PENIRQ
     _csTouch = 1;
 
-    _indev_drv.type = LV_INDEV_TYPE_POINTER; // touchpad
-    _indev_drv.read_cb = read;
-    _indev_drv.user_data = this;
-    _indev_drv.disp = lvglDispDriver->getLVDisp();
-    /* Register the driver in LittlevGL and save the created input device object*/
-    _my_indev = lv_indev_drv_register(&_indev_drv);
+    lv_indev_set_type(_indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(_indev, read_cb);
+    lv_indev_set_user_data(_indev, this);
 }
 
-void LVGLTouchDriverXPT2046::read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+void LVGLTouchDriverXPT2046::read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     static int16_t last_x = 0;
     static int16_t last_y = 0;
     
     int16_t x = 0;
     int16_t y = 0;
-    LVGLTouchDriverXPT2046 *me = (LVGLTouchDriverXPT2046 *)indev_drv->user_data;
+    LVGLTouchDriverXPT2046 *me = (LVGLTouchDriverXPT2046 *)lv_indev_get_user_data(indev);
     
     uint8_t irq = (me->_irqTouch).read();
 

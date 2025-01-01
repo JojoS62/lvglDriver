@@ -184,7 +184,7 @@ static const uint8_t wake_on[] = {
     //ILI9341_IFMODE,     1, 0x40             //RGB Signal [40] RCM=2
 };
 
-static lv_color_t framebuffer[240*16] __attribute__((section(".ram_ccm")));
+static lv_color16_t framebuffer[240*16] __attribute__((section(".ram_ccm")));
 // extern uint32_t __ram_ccm_start__;
 
 LVGLDispILI9341::LVGLDispILI9341(SPI &spi, PinName pinCS, PinName pinCMD, PinName pinRST, PinName pinBacklight, 
@@ -215,26 +215,21 @@ void LVGLDispILI9341::init()
     // _buf1_1 = (lv_color_t*)&__ram_ccm_start__;
     _buf1_1 = framebuffer;
     
-
-    lv_disp_draw_buf_init(&_disp_buf_1, _buf1_1, NULL, bufferSize);   /* Initialize the display buffer */
-
-    /*Finally register the driver*/
-    _disp_drv.flush_cb = disp_flush;
-    _disp_drv.draw_buf = &_disp_buf_1;
-    _disp_drv.user_data = this;
-    _disp = lv_disp_drv_register(&_disp_drv);
+    lv_display_set_flush_cb(_disp, disp_flush);
+    lv_display_set_buffers(_disp, _buf1_1, nullptr, bufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_user_data(_disp, this);
 }
 
-void LVGLDispILI9341::disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+void LVGLDispILI9341::disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
-    LVGLDispILI9341* instance = (LVGLDispILI9341*)disp_drv->user_data;
+    LVGLDispILI9341* instance = (LVGLDispILI9341*)lv_display_get_user_data(disp);
 
-    instance->flush(area, color_p);
+    instance->flush(area, (lv_color16_t *)px_map);
 
     // lv_disp_flush_ready(disp_drv);                 // called by async SPI transfer
 }
 
-void LVGLDispILI9341::flush(const lv_area_t *area, lv_color_t *color_p)
+void LVGLDispILI9341::flush(const lv_area_t *area, lv_color16_t *color_p)
 {
   	_spi.format(8, 0);		// switch to 8 bit transfer for commands
 
@@ -255,7 +250,7 @@ void LVGLDispILI9341::flush_ready(int event_flags)
 {
     if (event_flags & SPI_EVENT_COMPLETE) {
         _cs = 1;
-        lv_disp_flush_ready(&_disp_drv);         /* Indicate you are ready with the flushing*/
+        lv_display_flush_ready(_disp);         /* Indicate you are ready with the flushing*/
     }
 }
 
