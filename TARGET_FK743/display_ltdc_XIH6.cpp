@@ -398,13 +398,6 @@ extern "C" void HAL_LTDC_MspInit(LTDC_HandleTypeDef *hltdc)
         GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
         HAL_GPIO_Init(GPIOK, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = GPIO_PIN_10;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
         GPIO_InitStruct.Pin = GPIO_PIN_15|GPIO_PIN_14|GPIO_PIN_12|GPIO_PIN_13
                               |GPIO_PIN_9|GPIO_PIN_0|GPIO_PIN_8|GPIO_PIN_7
                               |GPIO_PIN_6|GPIO_PIN_1|GPIO_PIN_5|GPIO_PIN_3|GPIO_PIN_2
@@ -416,32 +409,25 @@ extern "C" void HAL_LTDC_MspInit(LTDC_HandleTypeDef *hltdc)
         HAL_GPIO_Init(GPIOJ, &GPIO_InitStruct);
 
         GPIO_InitStruct.Pin = GPIO_PIN_15;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
         HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
         GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
         HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = GPIO_PIN_4;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        GPIO_InitStruct.Pin = GPIO_PIN_10;
         GPIO_InitStruct.Alternate = GPIO_AF9_LTDC;
+        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+        GPIO_InitStruct.Pin = GPIO_PIN_4;
         HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
         // 初始化背光引脚
 
-        GPIO_InitStruct.Pin 		= LCD_Backlight_PIN;				// 背光引脚
+        GPIO_InitStruct.Pin 		= LCD_Backlight_PIN;		// 背光引脚
         GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;			// 推挽输出模式
-        GPIO_InitStruct.Pull 	= GPIO_NOPULL;						// 无上下拉
+        GPIO_InitStruct.Pull 	= GPIO_NOPULL;					// 无上下拉
         GPIO_InitStruct.Speed 	= GPIO_SPEED_FREQ_LOW;			// 速度等级低
+        GPIO_InitStruct.Alternate = GPIO_AF_NONE;			
         HAL_GPIO_Init(LCD_Backlight_PORT, &GPIO_InitStruct);	// 初始化
 
         LCD_Backlight_ON;	// 先关闭背光引脚，初始化LTDC之后再开启

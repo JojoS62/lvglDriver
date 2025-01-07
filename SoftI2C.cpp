@@ -6,14 +6,14 @@ SoftI2C::SoftI2C(PinName sda, PinName scl) : _sda(sda), _scl(scl) {
     _scl.mode(PullNone);
     _sda.input();
     _scl.input();
-    frequency(100000);
+    frequency(100'000);
     
     active = false;
     
     }
     
 void SoftI2C::frequency(int hz) {
-    delay_us = 1000000 / hz / 4; //delay is a quarter of the total period
+    delay_us = 1'000'000 / hz / 4; //delay is a quarter of the total period
 }
 
 int SoftI2C::read(int address, char *data, int length, bool repeated) {

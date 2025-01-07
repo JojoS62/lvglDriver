@@ -39,9 +39,24 @@ endif()
 if("FK743M5_XIH6" IN_LIST MBED_TARGET_LABELS)
     target_include_directories(lvglDriver INTERFACE "./TARGET_FK743")
     list(APPEND SOURCEFILES
+        SoftI2C.cpp
+        touch_driver_GT911.cpp
         TARGET_FK743/lcd_fonts.cpp
-        TARGET_FK743/display_ltdc.cpp
+        TARGET_FK743/display_ltdc_XIH6.cpp
         TARGET_FK743/LVGLDispDriver_FK743.cpp
+        TARGET_FK743/LVGLTouchDriver_FK743.cpp
+    )
+endif()
+
+if("FK743M2_IIT6" IN_LIST MBED_TARGET_LABELS)
+    target_include_directories(lvglDriver INTERFACE "./TARGET_FK743")
+    list(APPEND SOURCEFILES
+        SoftI2C.cpp
+        touch_driver_GT911.cpp
+        TARGET_FK743/lcd_fonts.cpp
+        TARGET_FK743/display_ltdc_IIT6.cpp
+        TARGET_FK743/LVGLDispDriver_FK743.cpp
+        TARGET_FK743/LVGLTouchDriver_FK743.cpp
     )
 endif()
 
