@@ -19,6 +19,9 @@ private:
     SoftI2C _i2c;
     DigitalInOut _int_pin;
     DigitalOut _rst_pin;
+    InterruptIn _int;
+    void _irq_handler();
+    EventFlags _event;
     
     bool _inited;
     char _product_id[4];

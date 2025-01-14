@@ -33,10 +33,13 @@
 #define GT911_PT1_X_SIZE_L              0x8154
 #define GT911_PT1_X_SIZE_H              0x8155
 
+DigitalOut testPin(PC_6);
+
 TouchDriverGT911::TouchDriverGT911(PinName sda, PinName scl, PinName int_pin, PinName rst_pin) :
     _i2c(sda, scl),
     _int_pin(int_pin, PIN_OUTPUT, PullUp, 0),
     _rst_pin(rst_pin, 1),
+    _int(int_pin),
     _last_x(0),
     _last_y(0),
     _invert_x(false),
@@ -44,6 +47,8 @@ TouchDriverGT911::TouchDriverGT911(PinName sda, PinName scl, PinName int_pin, Pi
     _swap_xy(false)
 {
     _dev_addr = GT911_I2C_SLAVE_ADDR;
+    _i2c.frequency(200'000);
+    
     init();
 }
 
@@ -92,12 +97,20 @@ void TouchDriverGT911::init()
         gt911_i2c_read(GT911_Y_COORD_RES_L, (uint8_t *)&_max_y_coord, sizeof(_max_y_coord));
         tr_info("\tY Resolution: %d", _max_y_coord);
 
+        _int.rise(callback(this, &TouchDriverGT911::_irq_handler));
         _inited = true;
     }
 }
 
 bool TouchDriverGT911::read(lv_indev_t *drv, lv_indev_data_t *data)
 {
+    volatile uint32_t flags = _event.get();
+    if (flags == 0) {
+        _event.clear(1);
+        return false;
+    }
+    _int.disable_irq();
+
     uint8_t touchdata[2+8];        // 2 bytes for status, 8 bytes for 1st touch point
 
     gt911_i2c_read(GT911_STATUS_REG, touchdata, 1); //sizeof(touchdata));
@@ -113,12 +126,12 @@ bool TouchDriverGT911::read(lv_indev_t *drv, lv_indev_data_t *data)
         data->point.x = _last_x;
         data->point.y = _last_y;
         data->state = LV_INDEV_STATE_REL;
+        // tr_info("X=%lu Y=%lu state=%d", data->point.x, data->point.y, data->state);
+        _int.enable_irq();
+        _event.clear(1);
         
         return false;
     }
-
-//    gt911_i2c_read(gt911_status.i2c_dev_addr, GT911_TRACK_ID1, &data_buf, 1);
-//    ESP_LOGI(TAG, "\ttrack_id: %d", data_buf);
 
     gt911_i2c_read(GT911_PT1_X_COORD_L, (uint8_t*)&_last_x, 2);
     gt911_i2c_read(GT911_PT1_Y_COORD_L, (uint8_t*)&_last_y, 2);
@@ -138,10 +151,19 @@ if (_swap_xy){
     data->point.x = _last_x;
     data->point.y = _last_y;
     data->state = LV_INDEV_STATE_PR;
-    tr_info("X=%lu Y=%lu", data->point.x, data->point.y);
-    tr_info("X=%lu Y=%lu", data->point.x, data->point.y);
+    tr_info("X=%lu Y=%lu state=%d", data->point.x, data->point.y, data->state);
+
+    _event.clear(1);
+    _int.enable_irq();
 
     return false;
+}
+
+void TouchDriverGT911::_irq_handler()
+{
+    testPin = 1;
+    _event.set(1);
+    testPin = 0;
 }
 
 int32_t TouchDriverGT911::gt911_i2c_read(uint16_t register_addr, uint8_t *data_buf, uint8_t len) {
