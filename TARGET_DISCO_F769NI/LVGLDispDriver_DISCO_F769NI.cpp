@@ -25,7 +25,7 @@
 // #include "systool.h"
 
 #define LV_HOR_RES_MAX          (800)
-#define LV_VER_RES_MAX          (480)
+#define LV_VER_RES_MAX          (472)
 #define BUFFERLINES (20)
 #define USE_STATIC_BUFFER (0)
 #define USE_DMA (1)

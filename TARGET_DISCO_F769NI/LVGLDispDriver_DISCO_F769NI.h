@@ -29,7 +29,7 @@
 
 class LVGLDispDISCO_F769NI : public LVGLDispDriver {
 public:
-    LVGLDispDISCO_F769NI(uint32_t nBufferRows = 10);
+    LVGLDispDISCO_F769NI(uint32_t nBufferRows = 20);
 
 private:
     LCD_DISCO_F769NI _lcd;
