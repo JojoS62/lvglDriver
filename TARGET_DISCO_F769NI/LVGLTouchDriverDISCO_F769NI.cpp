@@ -49,12 +49,12 @@ void LVGLTouchDriverDISCO_F769NI::read_cb(lv_indev_t * indev, lv_indev_data_t * 
 
     if (TS_State.touchDetected) {
         data->state = LV_INDEV_STATE_PR;
+        data->point.x = TS_State.touchX[0];
+        data->point.y = TS_State.touchY[0];
     } else {
         data->state = LV_INDEV_STATE_REL;
     }
 
-    data->point.x = TS_State.touchX[0];
-    data->point.y = TS_State.touchY[0];
 }
 
 MBED_WEAK LVGLInputDriver *LVGLInputDriver::get_target_default_instance_touchdrv(LVGLDispDriver *disp)
