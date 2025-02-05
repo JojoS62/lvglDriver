@@ -35,14 +35,13 @@ LVGLTouchDriverDISCO_F769NI::LVGLTouchDriverDISCO_F769NI(LVGLDispDriver *lvglDis
 {
     ts.Init(800, 472);
 
-    _indev_drv.type = LV_INDEV_TYPE_POINTER; // touchpad
-    _indev_drv.read_cb = read;
-    _indev_drv.user_data = this;
-    /* Register the driver in LittlevGL and save the created input device object*/
-    _my_indev = lv_indev_drv_register(&_indev_drv);
+    lv_indev_set_type(_indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(_indev, read_cb);
+    lv_indev_set_user_data(_indev, this);
+
 }
 
-void LVGLTouchDriverDISCO_F769NI::read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+void LVGLTouchDriverDISCO_F769NI::read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     TS_StateTypeDef TS_State;
 

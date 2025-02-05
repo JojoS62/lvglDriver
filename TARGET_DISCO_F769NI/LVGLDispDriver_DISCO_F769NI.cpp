@@ -32,8 +32,9 @@
 #define USE_DOUBLE_BUFFER (1)
 
 static Timer t;
-static int t0;
-static int t1;
+
+[[maybe_unused]] static int t0;
+[[maybe_unused]] static int t1;
 
 #if (USE_STATIC_BUFFER == 1)
 static lv_color_t xbuf1[LV_HOR_RES_MAX * BUFFERLINES];
@@ -45,7 +46,7 @@ static lv_color_t xbuf2[LV_HOR_RES_MAX * BUFFERLINES];
 #if (USE_DMA == 1)
 extern "C" void dmaXFerComplete(DMA2D_HandleTypeDef *hdma2d) 
 {
-    lv_disp_flush_ready(LVGLDispDriver::get_target_default_instance()->getLVDispDrv());
+    lv_disp_flush_ready(LVGLDispDriver::get_target_default_instance()->getLVDisp());
     // t1 = t.elapsed_time().count();      // get µs timestamp
 }
 #else
@@ -94,20 +95,16 @@ void LVGLDispDISCO_F769NI::init()
 #  endif
 #endif
 
-    /*Used to copy the buffer's content to the display*/
-    _disp_drv.flush_cb = disp_flush;
+    _disp = lv_display_create(LV_HOR_RES_MAX, LV_VER_RES_MAX);
+    lv_display_set_flush_cb(_disp, disp_flush);
+    lv_display_set_user_data(_disp, this);
 
-    /*Set a display buffer*/
-    _disp_drv.draw_buf = &_disp_buf_1;
 
 #if (USE_DOUBLE_BUFFER == 1)
-    lv_disp_draw_buf_init(&_disp_buf_1, xbuf1, xbuf2, bufferSize);   /* Initialize the display buffer */
+    lv_display_set_buffers(_disp, xbuf1, nullptr, bufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
 #else
-    lv_disp_draw_buf_init(&_disp_buf_1, xbuf1, nullptr, bufferSize);   /* Initialize the display buffer */
+    lv_display_set_buffers(_disp, xbuf1, xbuf2, bufferSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
 #endif
-
-    /*Finally register the driver*/
-    _disp = lv_disp_drv_register(&_disp_drv);
 
 #if (USE_DMA == 1)
     debug("display using DMA\n");
@@ -149,7 +146,7 @@ void LVGLDispDISCO_F769NI::init()
     t.start();      // start performance measurement timer
 }
 
-void LVGLDispDISCO_F769NI::disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+void LVGLDispDISCO_F769NI::disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t *px_map)
 {
 #if (USE_DMA == 1)
     uint32_t width = area->x2 - area->x1 + 1;
@@ -162,7 +159,7 @@ void LVGLDispDISCO_F769NI::disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *
     // printf("transfer cache: %d us\n", t1-t0);   // print previous transfer time
     // t0 = t.elapsed_time().count();              // get start time in µs
 
-    BSP_LCD_TransferBitmap(area->x1, area->y1, width, height, (uint32_t*)color_p);
+    BSP_LCD_TransferBitmap(area->x1, area->y1, width, height, (uint32_t*)px_map);
 #else
     // use DrawPixel to buffer write to screen
     int32_t x;
